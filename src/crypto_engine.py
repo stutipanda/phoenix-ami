@@ -224,16 +224,14 @@ class MeshCryptoNode:
 
         return pow(intermediate_shared_secret, bridging_token, self.n)
 
-    
+   
     @staticmethod
     def _derive_aes_key(shared_secret: int, salt: bytes) -> bytes:
         if shared_secret < 0:
             raise InvalidParameterError("Shared secret cannot be negative.")
 
-        if not isinstance(salt, bytes) or len(salt) != 12:
-            raise InvalidParameterError(
-                "Salt must be the 12-byte AES-GCM nonce."
-            )
+        if not isinstance(salt, bytes) or len(salt) < 12:
+            raise InvalidParameterError("Salt must be at least 12 bytes.")
 
         return HKDF(
             algorithm=hashes.SHA256(),
