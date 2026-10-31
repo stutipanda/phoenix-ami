@@ -119,3 +119,40 @@ if __name__ == "__main__":
     print(f"Route: {result.route}")
     print(f"Elapsed: {result.elapsed_ms:.3f} ms")
     print(f"Simulated messages: {result.messages_sent}")
+
+def build_large_mesh(rows: int = 4, cols: int = 5) -> MeshNetwork:
+    """Build a 20-node grid-based mesh network for the professor's demonstration."""
+    mesh = MeshNetwork()
+    
+    for r in range(rows):
+        for c in range(cols):
+            mesh.add_meter(f"meter-{r}-{c}")
+            
+    for r in range(rows):
+        for c in range(cols):
+            current = f"meter-{r}-{c}"
+            if c + 1 < cols:
+                mesh.add_link(current, f"meter-{r}-{c+1}")
+            if r + 1 < rows:
+                mesh.add_link(current, f"meter-{r+1}-{c}")
+                
+    return mesh
+
+import random
+
+def build_geometric_mesh(num_nodes: int, radius: float = 0.35) -> MeshNetwork:
+    """Build a random geometric graph to model rural AMI deployments."""
+    mesh = MeshNetwork()
+    
+    # Generate spatial graph and ensure it is fully connected
+    G = nx.random_geometric_graph(num_nodes, radius)
+    while not nx.is_connected(G):
+        G = nx.random_geometric_graph(num_nodes, radius)
+        
+    for node in G.nodes():
+        mesh.add_meter(f"meter-{node}")
+        
+    for u, v in G.edges():
+        mesh.add_link(f"meter-{u}", f"meter-{v}", latency_ms=random.uniform(5.0, 15.0))
+        
+    return mesh
