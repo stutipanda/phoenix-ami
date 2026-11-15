@@ -1,5 +1,10 @@
 
-cryptography>=44.0.0,<47.0.0
-pytest>=8.0.0,<10.0.0
-networkx>=3.2,<4.0
-cbor2>=5.6.0,<6.0.0
+networkx==3.5
+gmpy2==2.3.2
+cryptography==46.0.3
+cbor2==5.7.1
+numpy==2.3.5
+pandas==2.3.3
+matplotlib==3.10.8
+seaborn==0.13.2
+pytest==9.0.2

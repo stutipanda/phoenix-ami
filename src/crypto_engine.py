@@ -17,7 +17,7 @@ class InvalidParameterError(CryptoEngineError):
     """Invalid cryptographic parameter."""
 
 
-class AuthenticationError(CryptoEngineError):
+class AuthenticationError(CryptoEngineError, InvalidTag):
     """AES-GCM authentication failed."""
 
 
@@ -245,6 +245,7 @@ class MeshCryptoNode:
         shared_secret: int,
         plaintext: bytes,
         associated_data: Optional[bytes] = None,
+        nonce: Optional[bytes] = None,
     ) -> EncryptedTelemetry:
         if not isinstance(plaintext, bytes):
             raise InvalidParameterError("Plaintext must be bytes.")
@@ -254,7 +255,10 @@ class MeshCryptoNode:
         ):
             raise InvalidParameterError("Associated data must be bytes.")
 
-        nonce = secrets.token_bytes(12)
+        if nonce is None:
+            nonce = secrets.token_bytes(12)
+        elif not isinstance(nonce, bytes) or len(nonce) != 12:
+            raise InvalidParameterError("Nonce must be exactly 12 bytes.")
         key = MeshCryptoNode._derive_aes_key(shared_secret, nonce)
 
         ciphertext = AESGCM(key).encrypt(
